@@ -12,24 +12,6 @@ const __dirname = dirname(__filename);
 
 // mount/bind http server on socket.io
 const server = http.createServer(app);
-const foods = ["Pizza", "Burger", "Pasta", "Sushi", "Salad"];
-
-const getBotResponse = (msg) => {
-  const response = msg.toLowerCase();
-  if (response.includes(1)) {
-    return foods;
-  } else if (response.includes(98)) {
-    return ``;
-  } else if (response.includes(99)) {
-    return `order placed`;
-  } else if (response.includes(97)) {
-    return "Sorry, I did not understand that.";
-  } else if (response.includes(0)) {
-    return "Order cancelled";
-  } else {
-    return "No order to place   ";
-  }
-};
 
 const io = new Server(server);
 
@@ -49,8 +31,73 @@ io.on("connection", (socket) => {
     console.log("A customer disconnected", socket.id);
   });
 
+  let userArray = [];
+  let selectedFood = [];
+  let foodCheckout = [];
   socket.on("message", (msg) => {
-    const botResponse = getBotResponse(msg);
+    // console.log(msg);
+    var botResponse = ``;
+    if (msg == 1) {
+      // console.log(`Menu`);
+      botResponse = `Menu: 11. Pizza 32. Burger 43. Pasta 54. Coke`;
+      userArray.push({ user: msg });
+      console.log(userArray);
+    } else if (msg == 11) {
+      console.log(userArray.length);
+      if (userArray.length < 1) {
+        botResponse = `wrong selection, please select from the list provided`;
+      } else {
+        botResponse = `Pizza Selected`;
+        selectedFood.push(botResponse);
+
+        // console.log(selectedFood, food[0], foodCheckout);
+      }
+    } else if (msg == 32) {
+      console.log(userArray.length);
+      if (userArray.length < 1) {
+        botResponse = `wrong selection, please select from the list provided`;
+      } else {
+        botResponse = `Burger Selected`;
+        selectedFood.push(botResponse);
+      }
+    } else if (msg == 43) {
+      console.log(userArray.length);
+      if (userArray.length < 1) {
+        botResponse = `wrong selection, please select from the list provided`;
+      } else {
+        botResponse = `Pasta Selected`;
+        selectedFood.push(botResponse);
+      }
+    } else if (msg == 54) {
+      console.log(userArray.length);
+      if (userArray.length < 1) {
+        botResponse = `wrong selection, please select from the list provided`;
+      } else {
+        botResponse = `Coke Selected`;
+        selectedFood.push(botResponse);
+      }
+    } else if (msg == 98) {
+      if (userArray.length < 1) {
+        botResponse = `order has not been placed`;
+      } else {
+        botResponse = `Order History ${foodCheckout}`;
+      }
+    } else if (msg == 99) {
+      botResponse = `order placed`;
+    } else if (msg == 97) {
+      if (userArray.length < 1) {
+        botResponse = `order has not been placed`;
+      } else {
+        const food = selectedFood[0].split(" ");
+        foodCheckout.push(food[0]);
+        botResponse = `Your current order is ${foodCheckout}`;
+      }
+    } else if (msg == 0) {
+      botResponse = "Order cancelled";
+    } else {
+      ("No Order Placed, Please Select From The Menu.");
+    }
+    // console.log(botResponse);
     socket.emit("bot message", botResponse);
   });
 });
